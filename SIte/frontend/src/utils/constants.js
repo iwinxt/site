@@ -1,0 +1,7 @@
+export const CONSTANTS = {
+    API_BASE_URL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api',
+    STRIPE_PUBLIC_KEY: import.meta.env.VITE_STRIPE_PUBLIC_KEY,
+    VIDEO_PROGRESS_INTERVAL: 5000,
+    AUTO_COMPLETE_PERCENTAGE: 90,
+    TOKEN_REFRESH_THRESHOLD: 60000
+};

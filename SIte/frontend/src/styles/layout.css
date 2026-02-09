@@ -1,0 +1,65 @@
+.course-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+.course-main {
+    flex: 1;
+    margin-left: 320px;
+    padding: 24px;
+}
+
+.materials-section {
+    margin-top: 32px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 24px;
+}
+
+.materials-section h3 {
+    margin-bottom: 16px;
+}
+
+.materials-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.material-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: var(--white);
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.material-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--primary);
+}
+
+.material-icon {
+    font-size: 24px;
+}
+
+.material-name {
+    flex: 1;
+}
+
+.material-size {
+    color: var(--gray);
+    font-size: 14px;
+}
+
+@media (max-width: 768px) {
+    .course-main {
+        margin-left: 0;
+        padding: 16px;
+    }
+}

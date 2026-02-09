@@ -1,0 +1,408 @@
+.progress-bar-component {
+    width: 100%;
+    margin: 16px 0;
+}
+
+.progress-bar-component__track {
+    height: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress-bar-component__fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+    transition: width 0.3s ease;
+}
+
+.progress-bar-component__label {
+    display: block;
+    margin-top: 8px;
+    font-size: 14px;
+    color: var(--gray);
+}
+
+.video-player {
+    background: #000;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.video-player video {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.video-info {
+    padding: 24px;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.video-info h2 {
+    margin-bottom: 12px;
+}
+
+.video-info p {
+    color: var(--gray);
+}
+
+.quiz {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 24px;
+    margin-top: 24px;
+}
+
+.quiz h3 {
+    margin-bottom: 16px;
+}
+
+.quiz__question {
+    font-size: 18px;
+    margin-bottom: 24px;
+    line-height: 1.6;
+}
+
+.quiz__options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.quiz__option {
+    display: flex;
+    align-items: center;
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.quiz__option:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--primary);
+}
+
+.quiz__option input {
+    margin-right: 12px;
+}
+
+.quiz__submit {
+    padding: 12px 24px;
+    background: var(--primary);
+    color: var(--white);
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.quiz__submit:hover {
+    background: var(--secondary);
+}
+
+.quiz__result {
+    margin-top: 16px;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+.quiz__result.correct {
+    background: rgba(16, 185, 129, 0.2);
+    color: var(--success);
+}
+
+.quiz__result.incorrect {
+    background: rgba(239, 68, 68, 0.2);
+    color: var(--error);
+}
+
+.sidebar {
+    width: 320px;
+    background: rgba(255, 255, 255, 0.03);
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    height: 100vh;
+    overflow-y: auto;
+    position: fixed;
+    left: 0;
+    top: 0;
+}
+
+.sidebar__header {
+    padding: 24px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar__content {
+    padding: 16px;
+}
+
+.sidebar__module {
+    margin-bottom: 24px;
+}
+
+.sidebar__module h4 {
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    margin-bottom: 8px;
+}
+
+.sidebar__lessons {
+    list-style: none;
+}
+
+.sidebar__lesson {
+    margin-bottom: 4px;
+}
+
+.sidebar__lesson a {
+    display: block;
+    padding: 12px 16px;
+    color: var(--gray);
+    text-decoration: none;
+    border-radius: 6px;
+    transition: all 0.2s;
+}
+
+.sidebar__lesson a:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--white);
+}
+
+.sidebar__lesson.active a {
+    background: var(--primary);
+    color: var(--white);
+}
+
+.sidebar__lesson.locked a {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.checkout {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+}
+
+.checkout__summary {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 24px;
+}
+
+.checkout__summary img {
+    width: 100%;
+    border-radius: 8px;
+    margin-bottom: 16px;
+}
+
+.checkout__summary h2 {
+    margin-bottom: 12px;
+}
+
+.checkout__summary p {
+    color: var(--gray);
+}
+
+.checkout__form {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 24px;
+}
+
+.checkout__form h3 {
+    margin-bottom: 24px;
+}
+
+.checkout__plans {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.plan-option {
+    display: flex;
+    align-items: center;
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.plan-option:hover {
+    border-color: var(--primary);
+}
+
+.plan-option input:checked ~ .plan-option__content {
+    border-color: var(--primary);
+}
+
+.plan-option input {
+    margin-right: 16px;
+}
+
+.plan-option__content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.plan-option__name {
+    font-weight: 600;
+}
+
+.plan-option__price {
+    color: var(--primary);
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.checkout__card {
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    margin-bottom: 16px;
+}
+
+.checkout__errors {
+    color: var(--error);
+    font-size: 14px;
+    margin-bottom: 16px;
+    min-height: 20px;
+}
+
+.checkout__submit {
+    width: 100%;
+    padding: 16px;
+    background: var(--primary);
+    color: var(--white);
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.checkout__submit:hover:not(:disabled) {
+    background: var(--secondary);
+}
+
+.checkout__submit:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.payment-status {
+    max-width: 600px;
+    margin: 80px auto;
+    padding: 40px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    text-align: center;
+}
+
+.payment-status__icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    border-radius: 50%;
+}
+
+.payment-status.success .payment-status__icon {
+    background: rgba(16, 185, 129, 0.2);
+    color: var(--success);
+}
+
+.payment-status.pending .payment-status__icon {
+    background: rgba(251, 191, 36, 0.2);
+    color: #fbbf24;
+}
+
+.payment-status.error .payment-status__icon {
+    background: rgba(239, 68, 68, 0.2);
+    color: var(--error);
+}
+
+.payment-status h1 {
+    margin-bottom: 16px;
+}
+
+.payment-status p {
+    color: var(--gray);
+    margin-bottom: 32px;
+}
+
+.button {
+    display: inline-block;
+    padding: 12px 32px;
+    background: var(--primary);
+    color: var(--white);
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+
+.button:hover {
+    background: var(--secondary);
+}
+
+.loader-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+}
+
+.loader-spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid rgba(255, 255, 255, 0.1);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+@media (max-width: 768px) {
+    .checkout {
+        grid-template-columns: 1fr;
+    }
+
+    .sidebar {
+        width: 100%;
+        position: relative;
+        height: auto;
+    }
+
+    .course-grid {
+        grid-template-columns: 1fr;
+    }
+}
