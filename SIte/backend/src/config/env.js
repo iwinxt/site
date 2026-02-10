@@ -11,9 +11,6 @@ module.exports = {
     REFRESH_TOKEN_SECRET: process.env.REFRESH_TOKEN_SECRET,
     ENCRYPTION_KEY: process.env.ENCRYPTION_KEY,
     
-    STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
-    STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
-    
     PANDA_API_KEY: process.env.PANDA_API_KEY,
     PANDA_API_URL: process.env.PANDA_API_URL,
     

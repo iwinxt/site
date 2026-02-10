@@ -147,7 +147,7 @@ CREATE TABLE IF NOT EXISTS payments (
     amount DECIMAL(10, 2) NOT NULL,
     currency VARCHAR(3) DEFAULT 'BRL',
     payment_method VARCHAR(50),
-    payment_provider VARCHAR(50) CHECK (payment_provider IN ('stripe', 'mercadopago')),
+    payment_provider VARCHAR(50) CHECK (payment_provider IN ('mercadopago')),
     provider_payment_id VARCHAR(255),
     status VARCHAR(50) DEFAULT 'pending' CHECK (status IN ('pending', 'completed', 'failed', 'refunded')),
     metadata JSONB,

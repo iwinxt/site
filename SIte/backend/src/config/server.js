@@ -26,7 +26,4 @@ module.exports = {
         providers: ['panda', 'bunny']
     },
     
-    payment: {
-        providers: ['stripe', 'mercadopago']
-    }
 };
