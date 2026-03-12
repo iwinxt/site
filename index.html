@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GranjaOS — Sistema de Gerenciamento</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <span class="brand-icon">🐔</span>
+      <div>
+        <span class="brand-title">GranjaOS</span>
+        <span class="brand-sub">v1.0 — Gestão Rural</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <button class="nav-item active" data-page="dashboard">
+        <span class="nav-icon">⬛</span> Dashboard
+      </button>
+      <button class="nav-item" data-page="animais">
+        <span class="nav-icon">🐓</span> Animais
+      </button>
+      <button class="nav-item" data-page="producao">
+        <span class="nav-icon">🥚</span> Produção
+      </button>
+      <button class="nav-item" data-page="alimentacao">
+        <span class="nav-icon">🌾</span> Alimentação
+      </button>
+      <button class="nav-item" data-page="saude">
+        <span class="nav-icon">💉</span> Saúde
+      </button>
+      <button class="nav-item" data-page="financeiro">
+        <span class="nav-icon">💰</span> Financeiro
+      </button>
+      <button class="nav-item" data-page="relatorios">
+        <span class="nav-icon">📋</span> Relatórios
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="farm-status">
+        <span class="status-dot"></span>
+        <span>Sistema Online</span>
+      </div>
+      <div class="farm-date" id="sidebarDate"></div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main" id="main">
+
+    <!-- TOP BAR -->
+    <header class="topbar">
+      <button class="menu-toggle" id="menuToggle">☰</button>
+      <div class="topbar-title" id="pageTitle">Dashboard</div>
+      <div class="topbar-actions">
+        <button class="btn-notif" id="notifBtn">🔔 <span class="notif-badge" id="notifBadge">3</span></button>
+        <div class="user-avatar">JF</div>
+      </div>
+    </header>
+
+    <!-- NOTIFICATION PANEL -->
+    <div class="notif-panel" id="notifPanel">
+      <div class="notif-header">Alertas da Granja</div>
+      <div class="notif-item warn">⚠ Lote A3 — Vacinação vence em 2 dias</div>
+      <div class="notif-item info">🥚 Produção acima da média hoje (+12%)</div>
+      <div class="notif-item danger">🌡 Temperatura do galinheiro 4 elevada</div>
+    </div>
+
+    <!-- PAGES -->
+    <div class="pages">
+
+      <!-- ===== DASHBOARD ===== -->
+      <section class="page active" id="page-dashboard">
+        <div class="page-header">
+          <h1>Visão Geral</h1>
+          <p class="page-subtitle">Resumo operacional da granja — <span id="todayDate"></span></p>
+        </div>
+
+        <div class="kpi-grid">
+          <div class="kpi-card accent-green">
+            <div class="kpi-label">Total de Aves</div>
+            <div class="kpi-value" id="kpi-aves">12.480</div>
+            <div class="kpi-delta up">↑ 3,2% vs mês anterior</div>
+          </div>
+          <div class="kpi-card accent-amber">
+            <div class="kpi-label">Ovos Hoje</div>
+            <div class="kpi-value" id="kpi-ovos">9.842</div>
+            <div class="kpi-delta up">↑ 12% acima da média</div>
+          </div>
+          <div class="kpi-card accent-red">
+            <div class="kpi-label">Mortalidade (mês)</div>
+            <div class="kpi-value" id="kpi-mort">0,8%</div>
+            <div class="kpi-delta down">↓ 0,2% vs mês anterior</div>
+          </div>
+          <div class="kpi-card accent-blue">
+            <div class="kpi-label">Receita (mês)</div>
+            <div class="kpi-value" id="kpi-rec">R$ 48.320</div>
+            <div class="kpi-delta up">↑ 7,5% vs mês anterior</div>
+          </div>
+        </div>
+
+        <div class="dash-grid">
+          <div class="card chart-card">
+            <div class="card-header">Produção Diária — Últimos 14 dias</div>
+            <canvas id="chartProducao" height="220"></canvas>
+          </div>
+
+          <div class="card">
+            <div class="card-header">Status dos Lotes</div>
+            <div class="lotes-list" id="lotesList"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">Atividades Recentes</div>
+            <div class="atividades-list" id="atividadesList"></div>
+          </div>
+
+          <div class="card chart-card">
+            <div class="card-header">Distribuição por Galinheiro</div>
+            <canvas id="chartGalinheiro" height="220"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== ANIMAIS ===== -->
+      <section class="page" id="page-animais">
+        <div class="page-header">
+          <h1>Gestão de Animais</h1>
+          <p class="page-subtitle">Controle de lotes, raças e inventário</p>
+        </div>
+
+        <div class="toolbar">
+          <input type="text" class="search-input" id="searchAnimal" placeholder="Buscar lote ou raça..." />
+          <button class="btn btn-primary" onclick="openModal('modalAnimal')">+ Novo Lote</button>
+          <select class="filter-select" id="filterStatus">
+            <option value="">Todos os status</option>
+            <option value="Ativo">Ativo</option>
+            <option value="Quarentena">Quarentena</option>
+            <option value="Descarte">Descarte</option>
+          </select>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="data-table" id="tabelaAnimais">
+            <thead>
+              <tr>
+                <th>Lote</th>
+                <th>Raça</th>
+                <th>Galinheiro</th>
+                <th>Qtd. Aves</th>
+                <th>Idade (sem)</th>
+                <th>Status</th>
+                <th>Data Entrada</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="animaisBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ===== PRODUÇÃO ===== -->
+      <section class="page" id="page-producao">
+        <div class="page-header">
+          <h1>Controle de Produção</h1>
+          <p class="page-subtitle">Registro diário de ovos e métricas de postura</p>
+        </div>
+
+        <div class="toolbar">
+          <input type="date" class="date-input" id="dataProd" />
+          <button class="btn btn-primary" onclick="openModal('modalProducao')">+ Registrar Produção</button>
+          <button class="btn btn-outline" onclick="exportarProducao()">⬇ Exportar CSV</button>
+        </div>
+
+        <div class="kpi-grid small">
+          <div class="kpi-card accent-amber">
+            <div class="kpi-label">Taxa de Postura Hoje</div>
+            <div class="kpi-value" id="taxa-postura">78,9%</div>
+          </div>
+          <div class="kpi-card accent-green">
+            <div class="kpi-label">Ovos 1ª Classe</div>
+            <div class="kpi-value" id="ovos-primeira">7.220</div>
+          </div>
+          <div class="kpi-card accent-blue">
+            <div class="kpi-label">Ovos 2ª Classe</div>
+            <div class="kpi-value" id="ovos-segunda">2.340</div>
+          </div>
+          <div class="kpi-card accent-red">
+            <div class="kpi-label">Ovos Quebrados</div>
+            <div class="kpi-value" id="ovos-quebrados">282</div>
+          </div>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Lote</th>
+                <th>Galinheiro</th>
+                <th>Total Ovos</th>
+                <th>1ª Classe</th>
+                <th>2ª Classe</th>
+                <th>Quebrados</th>
+                <th>Taxa Postura</th>
+              </tr>
+            </thead>
+            <tbody id="producaoBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ===== ALIMENTAÇÃO ===== -->
+      <section class="page" id="page-alimentacao">
+        <div class="page-header">
+          <h1>Alimentação & Estoque</h1>
+          <p class="page-subtitle">Controle de ração, consumo e estoque de insumos</p>
+        </div>
+
+        <div class="toolbar">
+          <button class="btn btn-primary" onclick="openModal('modalAlimentacao')">+ Lançar Consumo</button>
+          <button class="btn btn-secondary" onclick="openModal('modalEstoque')">📦 Entrada de Estoque</button>
+        </div>
+
+        <div class="alim-grid">
+          <div class="card">
+            <div class="card-header">Estoque Atual</div>
+            <div id="estoqueList"></div>
+          </div>
+          <div class="card chart-card">
+            <div class="card-header">Consumo Semanal (kg)</div>
+            <canvas id="chartConsumo" height="200"></canvas>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:1.5rem">
+          <div class="card-header">Histórico de Consumo</div>
+          <div class="table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Tipo de Ração</th>
+                  <th>Lote</th>
+                  <th>Quantidade (kg)</th>
+                  <th>Responsável</th>
+                </tr>
+              </thead>
+              <tbody id="alimentacaoBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== SAÚDE ===== -->
+      <section class="page" id="page-saude">
+        <div class="page-header">
+          <h1>Saúde & Veterinária</h1>
+          <p class="page-subtitle">Vacinações, tratamentos e monitoramento sanitário</p>
+        </div>
+
+        <div class="toolbar">
+          <button class="btn btn-primary" onclick="openModal('modalSaude')">+ Registrar Ocorrência</button>
+          <button class="btn btn-secondary" onclick="openModal('modalVacina')">💉 Agendar Vacinação</button>
+        </div>
+
+        <div class="saude-grid">
+          <div class="card">
+            <div class="card-header">Próximas Vacinações</div>
+            <div id="vacinasList"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">Ocorrências Sanitárias</div>
+            <div class="table-wrapper">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Data</th>
+                    <th>Lote</th>
+                    <th>Tipo</th>
+                    <th>Descrição</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="saudeBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== FINANCEIRO ===== -->
+      <section class="page" id="page-financeiro">
+        <div class="page-header">
+          <h1>Financeiro</h1>
+          <p class="page-subtitle">Receitas, despesas e fluxo de caixa</p>
+        </div>
+
+        <div class="toolbar">
+          <button class="btn btn-primary" onclick="openModal('modalFinanceiro')">+ Nova Transação</button>
+          <select class="filter-select" id="filterFinanceiro">
+            <option value="">Todos os tipos</option>
+            <option value="Receita">Receita</option>
+            <option value="Despesa">Despesa</option>
+          </select>
+        </div>
+
+        <div class="kpi-grid small">
+          <div class="kpi-card accent-green">
+            <div class="kpi-label">Receitas (mês)</div>
+            <div class="kpi-value" id="fin-receita">R$ 48.320</div>
+          </div>
+          <div class="kpi-card accent-red">
+            <div class="kpi-label">Despesas (mês)</div>
+            <div class="kpi-value" id="fin-despesa">R$ 31.150</div>
+          </div>
+          <div class="kpi-card accent-blue">
+            <div class="kpi-label">Lucro Líquido</div>
+            <div class="kpi-value" id="fin-lucro">R$ 17.170</div>
+          </div>
+          <div class="kpi-card accent-amber">
+            <div class="kpi-label">Margem</div>
+            <div class="kpi-value" id="fin-margem">35,5%</div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:1.5rem">
+          <div class="card-header">Transações do Mês</div>
+          <div class="table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Descrição</th>
+                  <th>Categoria</th>
+                  <th>Tipo</th>
+                  <th>Valor</th>
+                </tr>
+              </thead>
+              <tbody id="financeiroBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== RELATÓRIOS ===== -->
+      <section class="page" id="page-relatorios">
+        <div class="page-header">
+          <h1>Relatórios</h1>
+          <p class="page-subtitle">Análises e exportações gerenciais</p>
+        </div>
+
+        <div class="relatorios-grid">
+          <div class="relatorio-card" onclick="gerarRelatorio('producao')">
+            <div class="rel-icon">🥚</div>
+            <div class="rel-title">Relatório de Produção</div>
+            <div class="rel-desc">Análise de postura, metas e comparativos</div>
+            <button class="btn btn-outline small">Gerar PDF</button>
+          </div>
+          <div class="relatorio-card" onclick="gerarRelatorio('financeiro')">
+            <div class="rel-icon">💰</div>
+            <div class="rel-title">DRE — Demonstrativo</div>
+            <div class="rel-desc">Receitas, custos e margem de contribuição</div>
+            <button class="btn btn-outline small">Gerar PDF</button>
+          </div>
+          <div class="relatorio-card" onclick="gerarRelatorio('saude')">
+            <div class="rel-icon">🏥</div>
+            <div class="rel-title">Relatório Sanitário</div>
+            <div class="rel-desc">Mortalidade, vacinações e ocorrências</div>
+            <button class="btn btn-outline small">Gerar PDF</button>
+          </div>
+          <div class="relatorio-card" onclick="gerarRelatorio('estoque')">
+            <div class="rel-icon">📦</div>
+            <div class="rel-title">Relatório de Estoque</div>
+            <div class="rel-desc">Consumo de ração e insumos</div>
+            <button class="btn btn-outline small">Gerar PDF</button>
+          </div>
+          <div class="relatorio-card" onclick="gerarRelatorio('animais')">
+            <div class="rel-icon">🐓</div>
+            <div class="rel-title">Inventário de Aves</div>
+            <div class="rel-desc">Lotes ativos, idades e movimentações</div>
+            <button class="btn btn-outline small">Gerar PDF</button>
+          </div>
+          <div class="relatorio-card" onclick="gerarRelatorio('completo')">
+            <div class="rel-icon">📊</div>
+            <div class="rel-title">Relatório Gerencial</div>
+            <div class="rel-desc">Consolidado completo da granja</div>
+            <button class="btn btn-primary small">Gerar Completo</button>
+          </div>
+        </div>
+      </section>
+
+    </div><!-- /pages -->
+  </main>
+
+  <!-- ===== MODAIS ===== -->
+
+  <!-- Modal Animal -->
+  <div class="modal-overlay" id="modalAnimal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Novo Lote de Aves</h2>
+        <button class="modal-close" onclick="closeModal('modalAnimal')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Código do Lote</label>
+            <input type="text" id="loteCodigo" placeholder="ex: A-05" />
+          </div>
+          <div class="form-group">
+            <label>Raça</label>
+            <select id="loteRaca">
+              <option>Isa Brown</option>
+              <option>Lohmann Brown</option>
+              <option>Hisex Brown</option>
+              <option>Nick Chick</option>
+              <option>Dekalb White</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Galinheiro</label>
+            <select id="loteGalinheiro">
+              <option>G-01</option><option>G-02</option>
+              <option>G-03</option><option>G-04</option>
+              <option>G-05</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Quantidade de Aves</label>
+            <input type="number" id="loteQtd" placeholder="ex: 2500" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Data de Entrada</label>
+            <input type="date" id="loteData" />
+          </div>
+          <div class="form-group">
+            <label>Idade (semanas)</label>
+            <input type="number" id="loteIdade" placeholder="ex: 18" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Observações</label>
+          <textarea id="loteObs" placeholder="Informações adicionais..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modalAnimal')">Cancelar</button>
+        <button class="btn btn-primary" onclick="salvarAnimal()">Salvar Lote</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Produção -->
+  <div class="modal-overlay" id="modalProducao">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Registrar Produção</h2>
+        <button class="modal-close" onclick="closeModal('modalProducao')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Data</label>
+            <input type="date" id="prodData" />
+          </div>
+          <div class="form-group">
+            <label>Lote</label>
+            <select id="prodLote"></select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Ovos 1ª Classe</label>
+            <input type="number" id="prodPrimeira" placeholder="0" />
+          </div>
+          <div class="form-group">
+            <label>Ovos 2ª Classe</label>
+            <input type="number" id="prodSegunda" placeholder="0" />
+          </div>
+          <div class="form-group">
+            <label>Ovos Quebrados</label>
+            <input type="number" id="prodQuebrados" placeholder="0" />
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modalProducao')">Cancelar</button>
+        <button class="btn btn-primary" onclick="salvarProducao()">Registrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Financeiro -->
+  <div class="modal-overlay" id="modalFinanceiro">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Nova Transação</h2>
+        <button class="modal-close" onclick="closeModal('modalFinanceiro')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Data</label>
+            <input type="date" id="finData" />
+          </div>
+          <div class="form-group">
+            <label>Tipo</label>
+            <select id="finTipo">
+              <option>Receita</option>
+              <option>Despesa</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Categoria</label>
+            <select id="finCategoria">
+              <option>Venda de Ovos</option>
+              <option>Venda de Aves</option>
+              <option>Ração</option>
+              <option>Medicamentos</option>
+              <option>Mão de Obra</option>
+              <option>Energia</option>
+              <option>Manutenção</option>
+              <option>Outros</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Valor (R$)</label>
+            <input type="number" id="finValor" placeholder="0,00" step="0.01" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Descrição</label>
+          <input type="text" id="finDesc" placeholder="Detalhes da transação..." />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modalFinanceiro')">Cancelar</button>
+        <button class="btn btn-primary" onclick="salvarTransacao()">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Saúde -->
+  <div class="modal-overlay" id="modalSaude">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Registrar Ocorrência Sanitária</h2>
+        <button class="modal-close" onclick="closeModal('modalSaude')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Data</label>
+            <input type="date" id="saudeData" />
+          </div>
+          <div class="form-group">
+            <label>Lote</label>
+            <select id="saudeLote"></select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Tipo</label>
+            <select id="saudeTipo">
+              <option>Doença</option>
+              <option>Lesão</option>
+              <option>Mortalidade</option>
+              <option>Parasitas</option>
+              <option>Outros</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Status</label>
+            <select id="saudeStatus">
+              <option>Em Tratamento</option>
+              <option>Resolvido</option>
+              <option>Monitorando</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Descrição</label>
+          <textarea id="saudeDesc" placeholder="Descreva a ocorrência..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modalSaude')">Cancelar</button>
+        <button class="btn btn-primary" onclick="salvarOcorrencia()">Registrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
