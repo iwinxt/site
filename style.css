@@ -353,7 +353,26 @@ html, body {
   border-bottom: 1px solid var(--border);
 }
 
-.chart-card canvas { display: block; padding: 16px; }
+.chart-card .chart-wrap {
+  position: relative;
+  height: 220px;
+  padding: 16px;
+}
+
+/* Gráfico doughnut (galinheiro) precisa de mais espaço para legenda */
+#chartGalinheiro ~ .chart-wrap,
+.chart-wrap:has(#chartGalinheiro) {
+  height: 260px;
+}
+
+.chart-card canvas {
+  display: block;
+}
+
+/* Gráfico de consumo na página alimentação — altura fixa */
+#chartConsumo {
+  max-height: 200px;
+}
 
 /* ============ LOTES LIST ============ */
 .lotes-list { padding: 8px 0; }
@@ -446,10 +465,15 @@ html, body {
 
 .btn-secondary {
   background: var(--bg3);
-  color: var(--text2);
+  color: var(--text);
   border-color: var(--border2);
+  border-width: 1px;
 }
-.btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+.btn-secondary:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(200,184,74,.07);
+}
 
 .btn-outline {
   background: transparent;

@@ -110,7 +110,9 @@
         <div class="dash-grid">
           <div class="card chart-card">
             <div class="card-header">Produção Diária — Últimos 14 dias</div>
-            <canvas id="chartProducao" height="220"></canvas>
+            <div class="chart-wrap">
+              <canvas id="chartProducao"></canvas>
+            </div>
           </div>
 
           <div class="card">
@@ -125,7 +127,9 @@
 
           <div class="card chart-card">
             <div class="card-header">Distribuição por Galinheiro</div>
-            <canvas id="chartGalinheiro" height="220"></canvas>
+            <div class="chart-wrap">
+              <canvas id="chartGalinheiro"></canvas>
+            </div>
           </div>
         </div>
       </section>
@@ -227,7 +231,7 @@
 
         <div class="toolbar">
           <button class="btn btn-primary" onclick="openModal('modalAlimentacao')">+ Lançar Consumo</button>
-          <button class="btn btn-secondary" onclick="openModal('modalEstoque')">📦 Entrada de Estoque</button>
+          <button class="btn btn-secondary" onclick="openModal('modalEstoque')">＋ Entrada de Estoque</button>
         </div>
 
         <div class="alim-grid">
@@ -237,7 +241,9 @@
           </div>
           <div class="card chart-card">
             <div class="card-header">Consumo Semanal (kg)</div>
-            <canvas id="chartConsumo" height="200"></canvas>
+            <div class="chart-wrap">
+              <canvas id="chartConsumo"></canvas>
+            </div>
           </div>
         </div>
 
@@ -269,7 +275,7 @@
 
         <div class="toolbar">
           <button class="btn btn-primary" onclick="openModal('modalSaude')">+ Registrar Ocorrência</button>
-          <button class="btn btn-secondary" onclick="openModal('modalVacina')">💉 Agendar Vacinação</button>
+          <button class="btn btn-secondary" onclick="openModal('modalVacina')">＋ Agendar Vacinação</button>
         </div>
 
         <div class="saude-grid">
@@ -602,6 +608,179 @@
       <div class="modal-footer">
         <button class="btn btn-outline" onclick="closeModal('modalSaude')">Cancelar</button>
         <button class="btn btn-primary" onclick="salvarOcorrencia()">Registrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Vacina -->
+  <div class="modal-overlay" id="modalVacina">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Agendar Vacinação</h2>
+        <button class="modal-close" onclick="closeModal('modalVacina')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Lote</label>
+            <select id="vacinaLote"></select>
+          </div>
+          <div class="form-group">
+            <label>Data Prevista</label>
+            <input type="date" id="vacinaData" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Nome da Vacina</label>
+            <select id="vacinaNome">
+              <option>Newcastle + Bronquite</option>
+              <option>Marek</option>
+              <option>Marek Reforço</option>
+              <option>Gumboro</option>
+              <option>Salmonela</option>
+              <option>Bouba Aviária</option>
+              <option>Cólera Aviária</option>
+              <option>Outra</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Responsável</label>
+            <input type="text" id="vacinaResponsavel" placeholder="Nome do veterinário..." />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Urgência</label>
+            <select id="vacinaUrgencia">
+              <option value="false">Planejado</option>
+              <option value="true">Urgente</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Via de Aplicação</label>
+            <select id="vacinaVia">
+              <option>Ocular</option>
+              <option>Oral (água)</option>
+              <option>Injeção IM</option>
+              <option>Spray</option>
+              <option>Asa (punção)</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Observações</label>
+          <textarea id="vacinaObs" placeholder="Instruções, dosagem, lote do imunobiológico..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modalVacina')">Cancelar</button>
+        <button class="btn btn-primary" onclick="salvarVacina()">Agendar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Entrada de Estoque -->
+  <div class="modal-overlay" id="modalEstoque">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Entrada de Estoque</h2>
+        <button class="modal-close" onclick="closeModal('modalEstoque')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Insumo</label>
+            <select id="estoqueInsumo" onchange="preencherEstoqueAtual()"></select>
+          </div>
+          <div class="form-group">
+            <label>Data de Entrada</label>
+            <input type="date" id="estoqueDataEnt" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Quantidade (kg)</label>
+            <input type="number" id="estoqueQtdEnt" placeholder="ex: 500" step="0.01" />
+          </div>
+          <div class="form-group">
+            <label>Estoque Atual</label>
+            <input type="text" id="estoqueAtualInfo" readonly placeholder="—" style="opacity:.6;cursor:not-allowed" />
+          </div>
+          <div class="form-group">
+            <label>Após Entrada</label>
+            <input type="text" id="estoqueAposInfo" readonly placeholder="—" style="color:var(--green);opacity:.8;cursor:not-allowed" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Fornecedor</label>
+            <input type="text" id="estoqueFornecedor" placeholder="Nome do fornecedor..." />
+          </div>
+          <div class="form-group">
+            <label>Valor Pago (R$)</label>
+            <input type="number" id="estoqueValorPago" placeholder="0,00" step="0.01" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Observações</label>
+          <textarea id="estoqueObsEnt" placeholder="Nº nota fiscal, lote do produto..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modalEstoque')">Cancelar</button>
+        <button class="btn btn-primary" onclick="salvarEntradaEstoque()">Confirmar Entrada</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Lançar Consumo de Ração -->
+  <div class="modal-overlay" id="modalAlimentacao">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Lançar Consumo de Ração</h2>
+        <button class="modal-close" onclick="closeModal('modalAlimentacao')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Data</label>
+            <input type="date" id="alimentacaoData" />
+          </div>
+          <div class="form-group">
+            <label>Lote</label>
+            <select id="alimentacaoLote"></select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Tipo de Ração</label>
+            <select id="alimentacaoTipo">
+              <option>Postura Fase 1</option>
+              <option>Postura Fase 2</option>
+              <option>Pré-postura</option>
+              <option>Milho Grão</option>
+              <option>Farelo de Soja</option>
+              <option>Calcário</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Quantidade (kg)</label>
+            <input type="number" id="alimentacaoQtd" placeholder="ex: 180" step="0.01" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Responsável</label>
+          <input type="text" id="alimentacaoResp" placeholder="Nome do responsável..." />
+        </div>
+        <div class="form-group">
+          <label>Observações</label>
+          <textarea id="alimentacaoObs" placeholder="Informações adicionais..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modalAlimentacao')">Cancelar</button>
+        <button class="btn btn-primary" onclick="salvarConsumoRacao()">Registrar</button>
       </div>
     </div>
   </div>
