@@ -1,20 +1,8 @@
 /* ================================================================
    GranjaOS — Supabase Client
    Arquivo: supabase.js
-
-   CONFIGURAÇÃO OBRIGATÓRIA:
-   Substitua os valores abaixo com os do seu projeto Supabase:
-     → supabase.com → seu projeto → Settings → API
-
-   COMO USAR NO index.html — adicione ANTES do app.js:
-     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-     <script src="supabase.js"></script>
-     <script src="app.js"></script>
 ================================================================ */
 
-// ---------------------------------------------------------------
-//  ⚙️  CONFIGURE AQUI
-// ---------------------------------------------------------------
 const SUPABASE_URL  = 'https://cjvdhnclmbjhcurerfge.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNqdmRobmNsbWJqaGN1cmVyZmdlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNjAxMjMsImV4cCI6MjA4OTkzNjEyM30.ehpf_kpdM3k9HVzhip8KXKCOeKNwykE_-5r1vbfRZgQ';
 // ---------------------------------------------------------------

@@ -1,6 +1,5 @@
 /* ================================================================
    GranjaOS — app.js  (versão Supabase)
-   Depende de: supabase.js  (carregado antes no index.html)
 ================================================================ */
 'use strict';
 
@@ -704,20 +703,8 @@ function updateChart() {
 }
 
 // ================================================================
-//  RELATÓRIOS (usa dados do state)
+//  RELATÓRIOS
 // ================================================================
-function gerarRelatorio(tipo) {
-  showToast('⏳ Gerando relatório...','success');
-  setTimeout(()=>{ const html=buildRelatorioHTML(tipo); abrirJanelaImpressao(html); },200);
-}
-
-function abrirJanelaImpressao(html) {
-  const win=window.open('','_blank','width=900,height=700');
-  if (!win) { showToast('⚠ Permita popups para gerar PDF','error'); return; }
-  win.document.write(html); win.document.close(); win.focus();
-  setTimeout(()=>win.print(),600);
-  showToast('✓ Use Ctrl+P → Salvar como PDF','success');
-}
 
 function relCSS(){return`<style>
   @import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap');
@@ -738,101 +725,180 @@ function relCSS(){return`<style>
   .badge-green{background:#e6f4e3;color:#2d7a24}.badge-amber{background:#fef3e2;color:#a06420}.badge-red{background:#fce8e8;color:#c44a4a}
   .receita{color:#2d7a24;font-weight:600}.despesa{color:#c44a4a;font-weight:600}
   .footer{margin-top:40px;padding-top:12px;border-top:1px solid #ddd;font-size:10px;color:#aaa;display:flex;justify-content:space-between}
-  hr.div{border:none;border-top:1px dashed #ddd;margin:24px 0}@media print{body{padding:20px}@page{margin:15mm;size:A4}}
+  @media print{body{padding:20px}@page{margin:15mm;size:A4}}
 </style>`;}
 
-function relHeader(titulo,subtitulo){const agora=new Date().toLocaleString('pt-BR');return`<div class="header"><div><div class="brand">🐔 GranjaOS</div><h1>${titulo}</h1><p class="subtitle">${subtitulo}</p></div><div class="header-right"><div>Emitido em: <strong>${agora}</strong></div><div>GranjaOS v1.0</div></div></div>`;}
-function relFooter(){return`<div class="footer"><span>GranjaOS — Sistema de Gerenciamento</span><span>Gerado automaticamente</span></div>`;}
-
-function buildRelatorioHTML(tipo){
-  const b={producao:buildRelProducao,financeiro:buildRelFinanceiro,saude:buildRelSaude,estoque:buildRelEstoque,animais:buildRelAnimais,completo:buildRelCompleto};
-  return`<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>GranjaOS</title>${relCSS()}</head><body>${(b[tipo]||b.completo)()}</body></html>`;
+function relHeader(titulo, subtitulo) {
+  const agora = new Date().toLocaleString('pt-BR');
+  return `<div class="header"><div><div class="brand">🐔 GranjaOS</div><h1>${titulo}</h1><p class="subtitle">${subtitulo}</p></div><div class="header-right"><div>Emitido em: <strong>${agora}</strong></div><div>GranjaOS v1.0</div></div></div>`;
 }
 
-function buildRelProducao(){
-  const tv=state.producao.reduce((s,p)=>s+(p.total||0),0),tp=state.producao.reduce((s,p)=>s+(p.primeira||0),0),ts=state.producao.reduce((s,p)=>s+(p.segunda||0),0),tq=state.producao.reduce((s,p)=>s+(p.quebrados||0),0);
-  return`${relHeader('Relatório de Produção','Coleta e classificação de ovos')}
-  <div class="kpi-row">
-    <div class="kpi-box amber"><div class="kpi-label">Total Ovos</div><div class="kpi-val amber">${fmt(tv)}</div></div>
-    <div class="kpi-box green"><div class="kpi-label">1ª Classe</div><div class="kpi-val green">${fmt(tp)}</div></div>
-    <div class="kpi-box blue"><div class="kpi-label">2ª Classe</div><div class="kpi-val blue">${fmt(ts)}</div></div>
-    <div class="kpi-box red"><div class="kpi-label">Quebrados</div><div class="kpi-val red">${fmt(tq)}</div></div>
-  </div>
-  <h2>Registros</h2>
-  <table><thead><tr><th>Data</th><th>Lote</th><th>Galinheiro</th><th>Total</th><th>1ª</th><th>2ª</th><th>Quebrados</th><th>Taxa</th></tr></thead>
-  <tbody>${state.producao.map(p=>`<tr><td>${fmtDate(p.data)}</td><td>${p.lote||'—'}</td><td>${p.galinheiro||'—'}</td><td>${fmt(p.total||0)}</td><td>${fmt(p.primeira)}</td><td>${fmt(p.segunda)}</td><td>${fmt(p.quebrados)}</td><td>${p.taxa_postura!=null?p.taxa_postura+'%':'—'}</td></tr>`).join('')}
-  <tr class="total-row"><td colspan="3">TOTAL</td><td>${fmt(tv)}</td><td>${fmt(tp)}</td><td>${fmt(ts)}</td><td>${fmt(tq)}</td><td>—</td></tr></tbody></table>${relFooter()}`;
+function relFooter() {
+  return `<div class="footer"><span>GranjaOS — Sistema de Gerenciamento</span><span>Gerado automaticamente</span></div>`;
 }
 
-function buildRelFinanceiro(){
-  const rec=state.financeiro.filter(f=>f.tipo==='Receita'),dep=state.financeiro.filter(f=>f.tipo==='Despesa');
-  const tr=rec.reduce((s,f)=>s+f.valor,0),td=dep.reduce((s,f)=>s+f.valor,0),lu=tr-td;
-  const cat={};dep.forEach(f=>{cat[f.categoria]=(cat[f.categoria]||0)+f.valor;});
-  return`${relHeader('DRE — Demonstrativo','Receitas, despesas e resultado')}
-  <div class="kpi-row">
-    <div class="kpi-box green"><div class="kpi-label">Receita</div><div class="kpi-val green">${fmtBRL(tr)}</div></div>
-    <div class="kpi-box red"><div class="kpi-label">Despesa</div><div class="kpi-val red">${fmtBRL(td)}</div></div>
-    <div class="kpi-box ${lu>=0?'green':'red'}"><div class="kpi-label">Lucro</div><div class="kpi-val ${lu>=0?'green':'red'}">${fmtBRL(lu)}</div></div>
-    <div class="kpi-box amber"><div class="kpi-label">Margem</div><div class="kpi-val amber">${tr>0?((lu/tr)*100).toFixed(1)+'%':'—'}</div></div>
-  </div>
-  <h2>Receitas</h2><table><thead><tr><th>Data</th><th>Descrição</th><th>Categoria</th><th>Valor</th></tr></thead>
-  <tbody>${rec.map(f=>`<tr><td>${fmtDate(f.data)}</td><td>${f.desc}</td><td>${f.categoria}</td><td class="receita">${fmtBRL(f.valor)}</td></tr>`).join('')}
-  <tr class="total-row"><td colspan="3">TOTAL RECEITAS</td><td class="receita">${fmtBRL(tr)}</td></tr></tbody></table>
-  <h2>Despesas por Categoria</h2><table><thead><tr><th>Categoria</th><th>Total</th><th>%</th></tr></thead>
-  <tbody>${Object.entries(cat).map(([c,v])=>`<tr><td>${c}</td><td class="despesa">${fmtBRL(v)}</td><td>${((v/td)*100).toFixed(1)}%</td></tr>`).join('')}
-  <tr class="total-row"><td>TOTAL</td><td class="despesa">${fmtBRL(td)}</td><td>100%</td></tr></tbody></table>${relFooter()}`;
+// kpis = [{ label, valor, cor }]
+function kpiRow(kpis) {
+  return `<div class="kpi-row">${kpis.map(k =>
+    `<div class="kpi-box ${k.cor||''}"><div class="kpi-label">${k.label}</div><div class="kpi-val ${k.cor||''}">${k.valor}</div></div>`
+  ).join('')}</div>`;
 }
 
-function buildRelSaude(){
-  return`${relHeader('Relatório Sanitário','Ocorrências e vacinações')}
-  <div class="kpi-row">
-    <div class="kpi-box blue"><div class="kpi-label">Ocorrências</div><div class="kpi-val">${state.saude.length}</div></div>
-    <div class="kpi-box amber"><div class="kpi-label">Em Tratamento</div><div class="kpi-val amber">${state.saude.filter(s=>s.status==='Em Tratamento').length}</div></div>
-    <div class="kpi-box green"><div class="kpi-label">Resolvidos</div><div class="kpi-val green">${state.saude.filter(s=>s.status==='Resolvido').length}</div></div>
-    <div class="kpi-box red"><div class="kpi-label">Vacinações Urgentes</div><div class="kpi-val red">${state.vacinas.filter(v=>v.urgente).length}</div></div>
-  </div>
-  <h2>Ocorrências</h2><table><thead><tr><th>Data</th><th>Lote</th><th>Tipo</th><th>Descrição</th><th>Status</th></tr></thead>
-  <tbody>${state.saude.map(s=>`<tr><td>${fmtDate(s.data)}</td><td>${s.lote}</td><td>${s.tipo}</td><td>${s.desc}</td><td>${s.status}</td></tr>`).join('')}</tbody></table>
-  <h2>Vacinações Pendentes</h2><table><thead><tr><th>Data</th><th>Lote</th><th>Vacina</th><th>Urgência</th></tr></thead>
-  <tbody>${state.vacinas.map(v=>`<tr><td>${v.dia}/${v.mes}</td><td>${v.lote}</td><td>${v.nome}</td><td>${v.urgente?'URGENTE':'Planejado'}</td></tr>`).join('')}</tbody></table>${relFooter()}`;
+// colunas = ['Data', ...], linhas = array de arrays, totalLinha (opcional)
+function tabela(colunas, linhas, totalLinha = null) {
+  const ths = colunas.map(c => `<th>${c}</th>`).join('');
+  const trs = linhas.map(cells => `<tr>${cells.map(c => `<td>${c}</td>`).join('')}</tr>`).join('');
+  const tot = totalLinha ? `<tr class="total-row">${totalLinha.map(c => `<td>${c}</td>`).join('')}</tr>` : '';
+  return `<table><thead><tr>${ths}</tr></thead><tbody>${trs}${tot}</tbody></table>`;
 }
 
-function buildRelEstoque(){
-  return`${relHeader('Relatório de Estoque','Nível de insumos e consumo')}
-  <h2>Estoque Atual</h2><table><thead><tr><th>Insumo</th><th>Qtd.</th><th>Capacidade</th><th>Nível</th><th>Status</th></tr></thead>
-  <tbody>${state.estoque.map(e=>{const p=Math.round((e.qtd/e.max)*100);return`<tr><td>${e.nome}</td><td>${fmt(e.qtd)} ${e.unidade}</td><td>${fmt(e.max)} ${e.unidade}</td><td>${p}%</td><td><span class="badge badge-${e.emAlerta?'red':p<60?'amber':'green'}">${e.emAlerta?'ALERTA':p<60?'MÉDIO':'OK'}</span></td></tr>`;}).join('')}</tbody></table>
-  <h2>Consumo</h2><table><thead><tr><th>Data</th><th>Ração</th><th>Lote</th><th>Qtd.</th><th>Resp.</th></tr></thead>
-  <tbody>${state.alimentacao.map(a=>`<tr><td>${fmtDate(a.data)}</td><td>${a.racao}</td><td>${a.lote}</td><td>${fmt(a.qtd)} kg</td><td>${a.responsavel}</td></tr>`).join('')}</tbody></table>${relFooter()}`;
+// secoes = [{ titulo, html }]
+function montarRelatorio(titulo, subtitulo, secoes) {
+  const corpo = secoes.map(s => `<h2>${s.titulo}</h2>${s.html}`).join('');
+  return `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>GranjaOS</title>${relCSS()}</head><body>${relHeader(titulo, subtitulo)}${corpo}${relFooter()}</body></html>`;
 }
 
-function buildRelAnimais(){
-  const total=state.animais.reduce((s,a)=>s+a.qtd,0);
-  return`${relHeader('Inventário de Aves','Relação de lotes e plantel')}
-  <div class="kpi-row">
-    <div class="kpi-box blue"><div class="kpi-label">Total Lotes</div><div class="kpi-val">${state.animais.length}</div></div>
-    <div class="kpi-box green"><div class="kpi-label">Total Aves</div><div class="kpi-val green">${fmt(total)}</div></div>
-    <div class="kpi-box green"><div class="kpi-label">Aves Ativas</div><div class="kpi-val green">${fmt(state.animais.filter(a=>a.status==='Ativo').reduce((s,a)=>s+a.qtd,0))}</div></div>
-  </div>
-  <h2>Lotes</h2><table><thead><tr><th>Lote</th><th>Raça</th><th>Galinheiro</th><th>Qtd.</th><th>Idade (sem.)</th><th>Status</th><th>Entrada</th></tr></thead>
-  <tbody>${state.animais.map(a=>`<tr><td><strong>${a.lote}</strong></td><td>${a.raca}</td><td>${a.galinheiro}</td><td>${fmt(a.qtd)}</td><td>${a.idade}</td><td>${a.status}</td><td>${fmtDate(a.data)}</td></tr>`).join('')}
-  <tr class="total-row"><td colspan="3">TOTAL</td><td>${fmt(total)}</td><td colspan="3">—</td></tr></tbody></table>${relFooter()}`;
+// ── Relatórios individuais ───────────────────────────────────────
+
+function buildRelProducao() {
+  const tv = state.producao.reduce((s,p)=>s+(p.total    ||0),0);
+  const tp = state.producao.reduce((s,p)=>s+(p.primeira ||0),0);
+  const ts = state.producao.reduce((s,p)=>s+(p.segunda  ||0),0);
+  const tq = state.producao.reduce((s,p)=>s+(p.quebrados||0),0);
+  return montarRelatorio('Relatório de Produção','Coleta e classificação de ovos',[
+    { titulo:'Resumo', html: kpiRow([
+      {label:'Total Ovos',valor:fmt(tv),cor:'amber'},{label:'1ª Classe',valor:fmt(tp),cor:'green'},
+      {label:'2ª Classe', valor:fmt(ts),cor:'blue'}, {label:'Quebrados',valor:fmt(tq),cor:'red'},
+    ])},
+    { titulo:'Registros', html: tabela(
+      ['Data','Lote','Galinheiro','Total','1ª','2ª','Quebrados','Taxa'],
+      state.producao.map(p=>[fmtDate(p.data),p.lote||'—',p.galinheiro||'—',fmt(p.total||0),fmt(p.primeira),fmt(p.segunda),fmt(p.quebrados),p.taxa_postura!=null?p.taxa_postura+'%':'—']),
+      ['TOTAL','','',fmt(tv),fmt(tp),fmt(ts),fmt(tq),'—'],
+    )},
+  ]);
 }
 
-function buildRelCompleto(){
-  const tr=state.financeiro.filter(f=>f.tipo==='Receita').reduce((s,f)=>s+f.valor,0);
-  const td=state.financeiro.filter(f=>f.tipo==='Despesa').reduce((s,f)=>s+f.valor,0);
-  return`${relHeader('Relatório Gerencial Completo','Consolidado operacional e financeiro')}
-  <div class="kpi-row">
-    <div class="kpi-box green"><div class="kpi-label">Aves Ativas</div><div class="kpi-val green">${fmt(state.animais.filter(a=>a.status==='Ativo').reduce((s,a)=>s+a.qtd,0))}</div></div>
-    <div class="kpi-box amber"><div class="kpi-label">Ovos Produzidos</div><div class="kpi-val amber">${fmt(state.producao.reduce((s,p)=>s+(p.total||0),0))}</div></div>
-    <div class="kpi-box green"><div class="kpi-label">Receita</div><div class="kpi-val green">${fmtBRL(tr)}</div></div>
-    <div class="kpi-box red"><div class="kpi-label">Despesas</div><div class="kpi-val red">${fmtBRL(td)}</div></div>
-    <div class="kpi-box ${tr-td>=0?'green':'red'}"><div class="kpi-label">Lucro</div><div class="kpi-val ${tr-td>=0?'green':'red'}">${fmtBRL(tr-td)}</div></div>
-  </div>
-  <hr class="div">${buildRelAnimais().split('</div>\n  <h2>')[1]?'<h2>'+buildRelAnimais().split('</div>\n  <h2>')[1].split(relFooter())[0]:''}
-  <hr class="div">${buildRelProducao().split('</div>\n  <h2>')[1]?'<h2>'+buildRelProducao().split('</div>\n  <h2>')[1].split(relFooter())[0]:''}
-  <hr class="div">${buildRelFinanceiro().split('</div>\n  <h2>')[1]?'<h2>'+buildRelFinanceiro().split('</div>\n  <h2>')[1].split(relFooter())[0]:''}
-  ${relFooter()}`;
+function buildRelFinanceiro() {
+  const rec = state.financeiro.filter(f=>f.tipo==='Receita');
+  const dep = state.financeiro.filter(f=>f.tipo==='Despesa');
+  const tr  = rec.reduce((s,f)=>s+f.valor,0);
+  const td  = dep.reduce((s,f)=>s+f.valor,0);
+  const lu  = tr - td;
+  const cat = {};
+  dep.forEach(f=>{ cat[f.categoria]=(cat[f.categoria]||0)+f.valor; });
+  return montarRelatorio('DRE — Demonstrativo','Receitas, despesas e resultado',[
+    { titulo:'Resumo', html: kpiRow([
+      {label:'Receita',valor:fmtBRL(tr),cor:'green'},{label:'Despesa',valor:fmtBRL(td),cor:'red'},
+      {label:'Lucro',valor:fmtBRL(lu),cor:lu>=0?'green':'red'},{label:'Margem',valor:tr>0?((lu/tr)*100).toFixed(1)+'%':'—',cor:'amber'},
+    ])},
+    { titulo:'Receitas', html: tabela(
+      ['Data','Descrição','Categoria','Valor'],
+      rec.map(f=>[fmtDate(f.data),f.desc,f.categoria,`<span class="receita">${fmtBRL(f.valor)}</span>`]),
+      ['TOTAL RECEITAS','','',`<span class="receita">${fmtBRL(tr)}</span>`],
+    )},
+    { titulo:'Despesas por categoria', html: tabela(
+      ['Categoria','Total','%'],
+      Object.entries(cat).map(([c,v])=>[c,`<span class="despesa">${fmtBRL(v)}</span>`,((v/td)*100).toFixed(1)+'%']),
+      ['TOTAL',`<span class="despesa">${fmtBRL(td)}</span>`,'100%'],
+    )},
+  ]);
+}
+
+function buildRelSaude() {
+  return montarRelatorio('Relatório Sanitário','Ocorrências e vacinações',[
+    { titulo:'Resumo', html: kpiRow([
+      {label:'Ocorrências',        valor:state.saude.length,                                        cor:'blue'},
+      {label:'Em Tratamento',      valor:state.saude.filter(s=>s.status==='Em Tratamento').length,  cor:'amber'},
+      {label:'Resolvidos',         valor:state.saude.filter(s=>s.status==='Resolvido').length,      cor:'green'},
+      {label:'Vacinações Urgentes',valor:state.vacinas.filter(v=>v.urgente).length,                 cor:'red'},
+    ])},
+    { titulo:'Ocorrências', html: tabela(
+      ['Data','Lote','Tipo','Descrição','Status'],
+      state.saude.map(s=>[fmtDate(s.data),s.lote,s.tipo,s.desc,s.status]),
+    )},
+    { titulo:'Vacinações pendentes', html: tabela(
+      ['Data','Lote','Vacina','Urgência'],
+      state.vacinas.map(v=>[`${v.dia}/${v.mes}`,v.lote,v.nome,v.urgente?'URGENTE':'Planejado']),
+    )},
+  ]);
+}
+
+function buildRelEstoque() {
+  return montarRelatorio('Relatório de Estoque','Nível de insumos e consumo',[
+    { titulo:'Estoque atual', html: tabela(
+      ['Insumo','Qtd.','Capacidade','Nível','Status'],
+      state.estoque.map(e=>{
+        const p=Math.round((e.qtd/e.max)*100), cor=e.emAlerta?'red':p<60?'amber':'green';
+        return [e.nome,`${fmt(e.qtd)} ${e.unidade}`,`${fmt(e.max)} ${e.unidade}`,p+'%',`<span class="badge badge-${cor}">${e.emAlerta?'ALERTA':p<60?'MÉDIO':'OK'}</span>`];
+      }),
+    )},
+    { titulo:'Histórico de consumo', html: tabela(
+      ['Data','Ração','Lote','Qtd.','Responsável'],
+      state.alimentacao.map(a=>[fmtDate(a.data),a.racao,a.lote,`${fmt(a.qtd)} kg`,a.responsavel]),
+    )},
+  ]);
+}
+
+function buildRelAnimais() {
+  const total  = state.animais.reduce((s,a)=>s+a.qtd,0);
+  const ativos = state.animais.filter(a=>a.status==='Ativo').reduce((s,a)=>s+a.qtd,0);
+  return montarRelatorio('Inventário de Aves','Relação de lotes e plantel',[
+    { titulo:'Resumo', html: kpiRow([
+      {label:'Total Lotes',valor:state.animais.length,cor:'blue'},
+      {label:'Total Aves', valor:fmt(total),          cor:'green'},
+      {label:'Aves Ativas',valor:fmt(ativos),         cor:'green'},
+    ])},
+    { titulo:'Lotes', html: tabela(
+      ['Lote','Raça','Galinheiro','Qtd.','Idade (sem.)','Status','Entrada'],
+      state.animais.map(a=>[`<strong>${a.lote}</strong>`,a.raca,a.galinheiro,fmt(a.qtd),a.idade,a.status,fmtDate(a.data)]),
+      ['TOTAL','','',fmt(total),'','',''],
+    )},
+  ]);
+}
+
+function buildRelCompleto() {
+  const tr = state.financeiro.filter(f=>f.tipo==='Receita').reduce((s,f)=>s+f.valor,0);
+  const td = state.financeiro.filter(f=>f.tipo==='Despesa').reduce((s,f)=>s+f.valor,0);
+  const lu = tr - td;
+  return montarRelatorio('Relatório Gerencial Completo','Consolidado operacional e financeiro',[
+    { titulo:'Resumo executivo', html: kpiRow([
+      {label:'Aves Ativas',    valor:fmt(state.animais.filter(a=>a.status==='Ativo').reduce((s,a)=>s+a.qtd,0)), cor:'green'},
+      {label:'Ovos Produzidos',valor:fmt(state.producao.reduce((s,p)=>s+(p.total||0),0)),                       cor:'amber'},
+      {label:'Receita',        valor:fmtBRL(tr),                                                                cor:'green'},
+      {label:'Despesas',       valor:fmtBRL(td),                                                                cor:'red'},
+      {label:'Lucro',          valor:fmtBRL(lu),                                                                cor:lu>=0?'green':'red'},
+    ])},
+    // Reutiliza seções das funções individuais para não duplicar lógica
+    ...['animais','producao','financeiro'].map(tipo => {
+      const fn = {animais:buildRelAnimais, producao:buildRelProducao, financeiro:buildRelFinanceiro}[tipo];
+      const secoes = [];
+      // Extrai as seções do HTML gerado (após o header, antes do footer)
+      const html = fn();
+      const matches = [...html.matchAll(/<h2>(.*?)<\/h2>([\s\S]*?)(?=<h2>|<div class="footer">)/g)];
+      matches.forEach(m => secoes.push({ titulo: m[1], html: m[2] }));
+      return secoes;
+    }).flat(),
+  ]);
+}
+
+// ── Entrada pública ──────────────────────────────────────────────
+
+function gerarRelatorio(tipo) {
+  const builders = {
+    producao: buildRelProducao, financeiro: buildRelFinanceiro,
+    saude: buildRelSaude, estoque: buildRelEstoque,
+    animais: buildRelAnimais, completo: buildRelCompleto,
+  };
+  showToast('⏳ Gerando relatório...','success');
+  setTimeout(()=>{ abrirJanelaImpressao((builders[tipo]||buildRelCompleto)()); },200);
+}
+
+function abrirJanelaImpressao(html) {
+  const win = window.open('','_blank','width=900,height=700');
+  if (!win) { showToast('⚠ Permita popups para gerar PDF','error'); return; }
+  win.document.write(html); win.document.close(); win.focus();
+  setTimeout(()=>win.print(),600);
+  showToast('✓ Use Ctrl+P → Salvar como PDF','success');
 }
 
 // ================================================================
